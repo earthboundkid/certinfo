@@ -5,12 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
+
+	"github.com/carlmjohnson/flagext"
 )
 
 func main() {
@@ -28,6 +32,9 @@ Options:
 `
 
 func exec() error {
+	verbose := flag.Bool("verbose", false)
+	mode := "text"
+	flag.Var(flagext.Choice(&mode, "json", "text"), "mode", "output mode: json or text")
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), usage)
 		flag.PrintDefaults()
@@ -35,6 +42,9 @@ func exec() error {
 
 	port := flag.Int("port", 443, "Port to look for TLS certificates on")
 	flag.Parse()
+	if !*verbose {
+		flag.SetOut(ioutil.Discard)
+	}
 
 	returnInfo := make([]hostinfo, flag.NArg())
 	errs := []error{}
@@ -47,12 +57,33 @@ func exec() error {
 		}
 	}
 
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
-	enc.SetEscapeHTML(false)
-	err := enc.Encode(&returnInfo)
-	if err != nil {
-		errs = append(errs, err)
+	switch mode {
+	case "json":
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(&returnInfo)
+		if err != nil {
+			errs = append(errs, err)
+		}
+
+	case "text":
+		t := template.Must(template.New("").Parse(`
+{{- range . -}}
+Host: {{ .Host }}:{{ .Port }}
+Certs:
+    {{ range .Certs -}}
+    Issuer: {{ .Cert.Issuer.CommonName }}
+    Subject: {{ .Cert.Subject.CommonName }}
+    Not Before: {{ .Cert.NotBefore.Format "Jan 2, 2006 3:04 PM" }}
+    Not After: {{ .Cert.NotAfter.Format "Jan 2, 2006 3:04 PM" }}
+    DNS names: {{ range .Cert.DNSNames }}{{ . }} {{ end }}
+{{ end }}
+{{- end -}}
+            `))
+		if err := t.Execute(os.Stdout, &returnInfo); err != nil {
+			errs = append(errs, err)
+		}
 	}
 
 	return mergeErrors(errs...)
@@ -65,7 +96,7 @@ type hostinfo struct {
 }
 
 type certinfo struct {
-	cert *x509.Certificate
+	Cert *x509.Certificate
 }
 
 func (h *hostinfo) getCerts() error {
@@ -106,11 +137,11 @@ func (c certinfo) MarshalJSON() ([]byte, error) {
 		NotBefore, NotAfter time.Time
 		DNSNames            []string
 	}{
-		c.cert.Issuer.String(),
-		c.cert.Subject.String(),
-		c.cert.NotBefore,
-		c.cert.NotAfter,
-		c.cert.DNSNames,
+		c.Cert.Issuer.CommonName,
+		c.Cert.Subject.CommonName,
+		c.Cert.NotBefore,
+		c.Cert.NotAfter,
+		c.Cert.DNSNames,
 	}
 	return json.Marshal(adaptor)
 }
@@ -124,6 +155,9 @@ func mergeErrors(errs ...error) error {
 	}
 	if len(filterErrs) < 1 {
 		return nil
+	}
+	if len(filterErrs) == 1 {
+		return filterErrs[0]
 	}
 	a := make([]string, len(filterErrs))
 	for i, err := range filterErrs {
