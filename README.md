@@ -21,20 +21,32 @@ Usage of certinfo
     certinfo [options] <host>...
 
 Options:
+  -mode value
+        output mode: json or text (default text)
   -port int
         Port to look for TLS certificates on (default 443)
-
+  -verbose
+        log connections
 
 $ certinfo example.com
-2018/10/05 16:13:05 connecting to example.com:443
+Host: example.com:443
+Certs:
+    Issuer: DigiCert SHA2 High Assurance Server CA
+    Subject: www.example.org
+    Not Before: Nov 3, 2015 12:00 AM
+    Not After: Nov 28, 2018 12:00 PM
+    DNS names: www.example.org example.com example.edu example.net example.org www.example.com www.example.edu www.example.net
+
+$ certinfo -mode json -verbose example.com
+2018/11/04 19:19:15 connecting to example.com:443
 [
   {
     "Host": "example.com",
     "Port": 443,
     "Certs": [
       {
-        "Issuer": "CN=DigiCert SHA2 High Assurance Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
-        "Subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
+        "Issuer": "DigiCert SHA2 High Assurance Server CA",
+        "Subject": "www.example.org",
         "NotBefore": "2015-11-03T00:00:00Z",
         "NotAfter": "2018-11-28T12:00:00Z",
         "DNSNames": [
