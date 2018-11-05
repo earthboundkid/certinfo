@@ -32,7 +32,7 @@ Options:
 `
 
 func exec() error {
-	verbose := flag.Bool("verbose", false)
+	verbose := flag.Bool("verbose", false, "log connections")
 	mode := "text"
 	flag.Var(flagext.Choice(&mode, "json", "text"), "mode", "output mode: json or text")
 	flag.Usage = func() {
@@ -43,7 +43,7 @@ func exec() error {
 	port := flag.Int("port", 443, "Port to look for TLS certificates on")
 	flag.Parse()
 	if !*verbose {
-		flag.SetOut(ioutil.Discard)
+		log.SetOutput(ioutil.Discard)
 	}
 
 	returnInfo := make([]hostinfo, flag.NArg())
