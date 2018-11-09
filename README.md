@@ -21,6 +21,8 @@ Usage of certinfo
     certinfo [options] <host>...
 
 Options:
+  -expires duration
+        error if cert expiration time is less than this; use 0 to disable (default 168h0m0s)
   -mode value
         output mode: json or text (default text)
   -port int
@@ -63,4 +65,15 @@ $ certinfo -mode json -verbose example.com
     ]
   }
 ]
+
+$ certinfo -expires 480h example.com
+Host: example.com:443
+Certs:
+    Issuer: DigiCert SHA2 High Assurance Server CA
+    Subject: www.example.org
+    Not Before: Nov 3, 2015 12:00 AM
+    Not After: Nov 28, 2018 12:00 PM
+    DNS names: www.example.org example.com example.edu example.net example.org www.example.com www.example.edu www.example.net
+Error: cert for www.example.org expires too soon: 2018-11-28T12:00:00Z less than 480h0m0s away
+
 ```

@@ -32,7 +32,10 @@ Options:
 `
 
 func exec() error {
+	port := flag.Int("port", 443, "Port to look for TLS certificates on")
 	verbose := flag.Bool("verbose", false, "log connections")
+	expires := flag.Duration("expires", 7*24*time.Hour,
+		"error if cert expiration time is less than this; use 0 to disable")
 	mode := "text"
 	flag.Var(flagext.Choice(&mode, "json", "text"), "mode", "output mode: json or text")
 	flag.Usage = func() {
@@ -40,7 +43,6 @@ func exec() error {
 		flag.PrintDefaults()
 	}
 
-	port := flag.Int("port", 443, "Port to look for TLS certificates on")
 	flag.Parse()
 	if !*verbose {
 		log.SetOutput(ioutil.Discard)
@@ -83,6 +85,21 @@ Certs:
             `))
 		if err := t.Execute(os.Stdout, &returnInfo); err != nil {
 			errs = append(errs, err)
+		}
+	}
+
+	if *expires != 0 {
+		deadline := time.Now().Add(*expires)
+		for _, hi := range returnInfo {
+			for _, c := range hi.Certs {
+				if deadline.After(c.Cert.NotAfter) {
+					err := fmt.Errorf("cert for %s expires too soon: %s less than %s away",
+						c.Cert.Subject.CommonName,
+						c.Cert.NotAfter.Format(time.RFC3339),
+						expires)
+					errs = append(errs, err)
+				}
+			}
 		}
 	}
 
