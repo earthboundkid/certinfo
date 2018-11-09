@@ -27,6 +27,8 @@ Options:
         output mode: json or text (default text)
   -port int
         Port to look for TLS certificates on (default 443)
+  -timeout duration
+        time out on TCP dialing (default 5s)
   -verbose
         log connections
 

@@ -34,6 +34,7 @@ Options:
 func exec() error {
 	port := flag.Int("port", 443, "Port to look for TLS certificates on")
 	verbose := flag.Bool("verbose", false, "log connections")
+	timeout := flag.Duration("timeout", 5*time.Second, "time out on TCP dialing")
 	expires := flag.Duration("expires", 7*24*time.Hour,
 		"error if cert expiration time is less than this; use 0 to disable")
 	mode := "text"
@@ -53,7 +54,7 @@ func exec() error {
 	for i, host := range flag.Args() {
 		returnInfo[i].Host = host
 		returnInfo[i].Port = *port
-		err := returnInfo[i].getCerts()
+		err := returnInfo[i].getCerts(*timeout)
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -116,9 +117,9 @@ type certinfo struct {
 	Cert *x509.Certificate
 }
 
-func (h *hostinfo) getCerts() error {
+func (h *hostinfo) getCerts(timeout time.Duration) error {
 	log.Printf("connecting to %s:%d", h.Host, h.Port)
-	dialer := &net.Dialer{Timeout: 5 * time.Second}
+	dialer := &net.Dialer{Timeout: timeout}
 	conn, err := tls.DialWithDialer(
 		dialer,
 		"tcp",
