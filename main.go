@@ -38,7 +38,10 @@ func exec() error {
 	expires := flag.Duration("expires", 7*24*time.Hour,
 		"error if cert expiration time is less than this; use 0 to disable")
 	mode := "text"
-	flag.Var(flagext.Choice(&mode, "json", "text"), "mode", "output mode: json or text")
+	flag.Var(
+		flagext.Choice(&mode, "json", "text", "none"),
+		"output",
+		"output `mode`: text, json, or none")
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), usage)
 		flag.PrintDefaults()
@@ -87,6 +90,7 @@ Certs:
 		if err := t.Execute(os.Stdout, &returnInfo); err != nil {
 			errs = append(errs, err)
 		}
+	case "none":
 	}
 
 	if *expires != 0 {
