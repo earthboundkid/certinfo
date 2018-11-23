@@ -79,11 +79,11 @@ func exec() error {
 Host: {{ .Host }}:{{ .Port }}
 Certs:
     {{ range .Certs -}}
-    Issuer: {{ .Cert.Issuer.CommonName }}
-    Subject: {{ .Cert.Subject.CommonName }}
-    Not Before: {{ .Cert.NotBefore.Format "Jan 2, 2006 3:04 PM" }}
-    Not After: {{ .Cert.NotAfter.Format "Jan 2, 2006 3:04 PM" }}
-    DNS names: {{ range .Cert.DNSNames }}{{ . }} {{ end }}
+    Issuer: {{ .Issuer.CommonName }}
+    Subject: {{ .Subject.CommonName }}
+    Not Before: {{ .NotBefore.Format "Jan 2, 2006 3:04 PM" }}
+    Not After: {{ .NotAfter.Format "Jan 2, 2006 3:04 PM" }}
+    DNS names: {{ range .DNSNames }}{{ . }} {{ end }}
 {{ end }}
 {{- end -}}
             `))
@@ -97,10 +97,10 @@ Certs:
 		deadline := time.Now().Add(*expires)
 		for _, hi := range returnInfo {
 			for _, c := range hi.Certs {
-				if deadline.After(c.Cert.NotAfter) {
+				if deadline.After(c.NotAfter) {
 					err := fmt.Errorf("cert for %s expires too soon: %s less than %s away",
-						c.Cert.Subject.CommonName,
-						c.Cert.NotAfter.Format(time.RFC3339),
+						c.Subject.CommonName,
+						c.NotAfter.Format(time.RFC3339),
 						expires)
 					errs = append(errs, err)
 				}
@@ -114,11 +114,7 @@ Certs:
 type hostinfo struct {
 	Host  string
 	Port  int
-	Certs []certinfo
-}
-
-type certinfo struct {
-	Cert *x509.Certificate
+	Certs []*x509.Certificate
 }
 
 func (h *hostinfo) getCerts(timeout time.Duration) error {
@@ -142,30 +138,15 @@ func (h *hostinfo) getCerts(timeout time.Duration) error {
 	}
 
 	pc := conn.ConnectionState().PeerCertificates
-	h.Certs = make([]certinfo, 0, len(pc))
+	h.Certs = make([]*x509.Certificate, 0, len(pc))
 	for _, cert := range pc {
 		if cert.IsCA {
 			continue
 		}
-		h.Certs = append(h.Certs, certinfo{cert})
+		h.Certs = append(h.Certs, cert)
 	}
 
 	return nil
-}
-
-func (c certinfo) MarshalJSON() ([]byte, error) {
-	var adaptor = struct {
-		Issuer, Subject     string
-		NotBefore, NotAfter time.Time
-		DNSNames            []string
-	}{
-		c.Cert.Issuer.CommonName,
-		c.Cert.Subject.CommonName,
-		c.Cert.NotBefore,
-		c.Cert.NotAfter,
-		c.Cert.DNSNames,
-	}
-	return json.Marshal(adaptor)
 }
 
 func mergeErrors(errs ...error) error {
