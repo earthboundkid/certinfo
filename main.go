@@ -1,4 +1,4 @@
-package main // import "github.com/baltimore-sun-data/certinfo"
+package main // import "github.com/carlmjohnson/certinfo"
 import (
 	"crypto/tls"
 	"crypto/x509"
