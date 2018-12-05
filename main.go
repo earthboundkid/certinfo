@@ -10,10 +10,10 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"strings"
 	"text/template"
 	"time"
 
+	"github.com/carlmjohnson/errors"
 	"github.com/carlmjohnson/flagext"
 )
 
@@ -52,14 +52,14 @@ func exec() error {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	returnInfo := make([]hostinfo, flag.NArg())
-	errs := []error{}
-	for i, host := range flag.Args() {
-		returnInfo[i].Host = host
-		returnInfo[i].Port = *port
-		err := returnInfo[i].getCerts(*timeout)
-		if err != nil {
-			errs = append(errs, err)
+	returnInfo := make([]hostinfo, 0, flag.NArg())
+	var errs errors.Slice
+	for _, host := range flag.Args() {
+		info := hostinfo{Host: host, Port: *port}
+		err := info.getCerts(*timeout)
+		errs.Push(err)
+		if err == nil {
+			returnInfo = append(returnInfo, info)
 		}
 	}
 
@@ -69,9 +69,7 @@ func exec() error {
 		enc.SetIndent("", "  ")
 		enc.SetEscapeHTML(false)
 		err := enc.Encode(&returnInfo)
-		if err != nil {
-			errs = append(errs, err)
-		}
+		errs.Push(err)
 
 	case "text":
 		t := template.Must(template.New("").Parse(`
@@ -87,9 +85,9 @@ Certs:
 {{ end }}
 {{- end -}}
             `))
-		if err := t.Execute(os.Stdout, &returnInfo); err != nil {
-			errs = append(errs, err)
-		}
+		err := t.Execute(os.Stdout, &returnInfo)
+		errs.Push(err)
+
 	case "none":
 	}
 
@@ -102,13 +100,13 @@ Certs:
 						c.Subject.CommonName,
 						c.NotAfter.Format(time.RFC3339),
 						expires)
-					errs = append(errs, err)
+					errs.Push(err)
 				}
 			}
 		}
 	}
 
-	return mergeErrors(errs...)
+	return errs.Merge()
 }
 
 type hostinfo struct {
@@ -147,24 +145,4 @@ func (h *hostinfo) getCerts(timeout time.Duration) error {
 	}
 
 	return nil
-}
-
-func mergeErrors(errs ...error) error {
-	filterErrs := errs[:0]
-	for _, err := range errs {
-		if err != nil {
-			filterErrs = append(filterErrs, err)
-		}
-	}
-	if len(filterErrs) < 1 {
-		return nil
-	}
-	if len(filterErrs) == 1 {
-		return filterErrs[0]
-	}
-	a := make([]string, len(filterErrs))
-	for i, err := range filterErrs {
-		a[i] = err.Error()
-	}
-	return fmt.Errorf("%d errors: %s", len(a), strings.Join(a, "; "))
 }
