@@ -49,20 +49,7 @@ $ certinfo -output json -verbose example.com
     "Port": 443,
     "Certs": [
       {
-        "Issuer": "DigiCert SHA2 High Assurance Server CA",
-        "Subject": "www.example.org",
-        "NotBefore": "2015-11-03T00:00:00Z",
-        "NotAfter": "2018-11-28T12:00:00Z",
-        "DNSNames": [
-          "www.example.org",
-          "example.com",
-          "example.edu",
-          "example.net",
-          "example.org",
-          "www.example.com",
-          "www.example.edu",
-          "www.example.net"
-        ]
+        // snip many fields!
       }
     ]
   }
@@ -71,6 +58,6 @@ $ certinfo -output json -verbose example.com
 $ certinfo -output none -expires 24h example.com
 
 $ certinfo -output none -expires 480h example.com
-Error: cert for www.example.org expires too soon: 2018-11-28T12:00:00Z less than 480h0m0s away
+Runtime error: cert for www.example.org expires too soon: 2018-11-28T12:00:00Z less than 480h0m0s away
 
 ```
