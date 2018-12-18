@@ -19,7 +19,11 @@ import (
 
 func main() {
 	if err := exec(); err != nil {
-		fmt.Printf("Error: %v\n", err)
+		if _, ok := err.(errors.Slice); ok {
+			fmt.Printf("Multiple runtime errors: %#v", err)
+		} else {
+			fmt.Printf("Runtime error: %v\n", err)
+		}
 		os.Exit(1)
 	}
 }
@@ -83,8 +87,8 @@ Certs:
     Not After: {{ .NotAfter.Format "Jan 2, 2006 3:04 PM" }}
     DNS names: {{ range .DNSNames }}{{ . }} {{ end }}
 {{ end }}
-{{- end -}}
-            `))
+{{ end -}}
+        `))
 		err := t.Execute(os.Stdout, &returnInfo)
 		errs.Push(err)
 
