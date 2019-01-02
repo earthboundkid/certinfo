@@ -18,14 +18,7 @@ import (
 )
 
 func main() {
-	if err := exec(); err != nil {
-		if _, ok := err.(errors.Slice); ok {
-			fmt.Printf("Multiple runtime errors: %#v", err)
-		} else {
-			fmt.Printf("Runtime error: %v\n", err)
-		}
-		os.Exit(1)
-	}
+	os.Exit(errors.Execute(exec, nil))
 }
 
 const usage = `Usage of certinfo
@@ -35,30 +28,34 @@ const usage = `Usage of certinfo
 Options:
 `
 
-func exec() error {
-	port := flag.Int("port", 443, "Port to look for TLS certificates on")
-	verbose := flag.Bool("verbose", false, "log connections")
-	timeout := flag.Duration("timeout", 5*time.Second, "time out on TCP dialing")
-	expires := flag.Duration("expires", 7*24*time.Hour,
+func exec(args []string) error {
+	fl := flag.NewFlagSet("json-tidy", flag.ContinueOnError)
+	port := fl.Int("port", 443, "Port to look for TLS certificates on")
+	verbose := fl.Bool("verbose", false, "log connections")
+	timeout := fl.Duration("timeout", 5*time.Second, "time out on TCP dialing")
+	expires := fl.Duration("expires", 7*24*time.Hour,
 		"error if cert expiration time is less than this; use 0 to disable")
 	mode := "text"
-	flag.Var(
+	fl.Var(
 		flagext.Choice(&mode, "json", "text", "none"),
 		"output",
 		"output `mode`: text, json, or none")
-	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), usage)
-		flag.PrintDefaults()
+	fl.Usage = func() {
+		fmt.Fprintf(fl.Output(), usage)
+		fl.PrintDefaults()
 	}
 
-	flag.Parse()
+	if err := fl.Parse(args); err != nil {
+		return flag.ErrHelp
+	}
 	if !*verbose {
 		log.SetOutput(ioutil.Discard)
 	}
+	hosts := fl.Args()
 
-	returnInfo := make([]hostinfo, 0, flag.NArg())
+	returnInfo := make([]hostinfo, 0, len(hosts))
 	var errs errors.Slice
-	for _, host := range flag.Args() {
+	for _, host := range hosts {
 		info := hostinfo{Host: host, Port: *port}
 		err := info.getCerts(*timeout)
 		errs.Push(err)
