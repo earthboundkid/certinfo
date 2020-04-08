@@ -1,4 +1,8 @@
-github.com/carlmjohnson/errors v0.0.6 h1:XiR0zP9xp6fuboliME2Bch/5BigmcdokZhpUVwMuVeM=
-github.com/carlmjohnson/errors v0.0.6/go.mod h1:UYcgVkDrp62DKybBUnX993mCAIkw+5OCmq9Msg1RiSM=
+github.com/carlmjohnson/errutil v0.0.9 h1:yXt7hPUPZb9/ApOWOQSE7lHrMvsr7SAaV4Urhjao7cc=
+github.com/carlmjohnson/errutil v0.0.9/go.mod h1:zbiOz7twV9EBHJ+6Yj+7MiHyFL383pqU+ULblUhtaKw=
+github.com/carlmjohnson/exitcode v0.0.4 h1:C5c0GBs/1iuo5cKIHBHdBQVENeAmgPZcyXtqBKCe5i0=
+github.com/carlmjohnson/exitcode v0.0.4/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
 github.com/carlmjohnson/flagext v0.0.1 h1:5r8xdcALgCXC/aMpRhELvUszuFi4laZzA6GvVq3GfMA=
 github.com/carlmjohnson/flagext v0.0.1/go.mod h1:dg/yd3ze75o3frOmgsPvEG3UnH0pEzdAOx62p6TTuYc=
+golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 h1:/atklqdjdhuosWIl6AIbOeHJjicWYPqR9bpxqxYG2pA=
+golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=

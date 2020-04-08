@@ -13,12 +13,13 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/carlmjohnson/errors"
+	"github.com/carlmjohnson/errutil"
+	"github.com/carlmjohnson/exitcode"
 	"github.com/carlmjohnson/flagext"
 )
 
 func main() {
-	os.Exit(errors.Execute(exec, nil))
+	exitcode.Exit(exec(os.Args))
 }
 
 const usage = `Usage of certinfo
@@ -54,7 +55,7 @@ func exec(args []string) error {
 	hosts := fl.Args()
 
 	returnInfo := make([]hostinfo, 0, len(hosts))
-	var errs errors.Slice
+	var errs errutil.Slice
 	for _, host := range hosts {
 		info := hostinfo{Host: host, Port: *port}
 		err := info.getCerts(*timeout)
