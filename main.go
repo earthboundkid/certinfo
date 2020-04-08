@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"strconv"
 	"text/template"
@@ -52,7 +53,7 @@ func exec(args []string) error {
 	if !*verbose {
 		log.SetOutput(ioutil.Discard)
 	}
-	hosts := fl.Args()
+	hosts := hostsFrom(fl.Args())
 
 	returnInfo := make([]hostinfo, 0, len(hosts))
 	var errs errutil.Slice
@@ -109,6 +110,16 @@ Certs:
 	}
 
 	return errs.Merge()
+}
+
+func hostsFrom(ss []string) []string {
+	for i, s := range ss {
+		u, _ := url.Parse(s)
+		if host := u.Hostname(); host != "" {
+			ss[i] = host
+		}
+	}
+	return ss
 }
 
 type hostinfo struct {
