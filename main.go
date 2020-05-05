@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	exitcode.Exit(exec(os.Args))
+	exitcode.Exit(exec(os.Args[1:]))
 }
 
 const usage = `Usage of certinfo
