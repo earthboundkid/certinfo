@@ -1,10 +1,6 @@
-github.com/carlmjohnson/errutil v0.0.9 h1:yXt7hPUPZb9/ApOWOQSE7lHrMvsr7SAaV4Urhjao7cc=
-github.com/carlmjohnson/errutil v0.0.9/go.mod h1:zbiOz7twV9EBHJ+6Yj+7MiHyFL383pqU+ULblUhtaKw=
-github.com/carlmjohnson/exitcode v0.0.4 h1:C5c0GBs/1iuo5cKIHBHdBQVENeAmgPZcyXtqBKCe5i0=
-github.com/carlmjohnson/exitcode v0.0.4/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
-github.com/carlmjohnson/flagext v0.0.11 h1:k2K/FCzmfdoYsDLZpHw8w/+V2Rt5gRgCXEfR4Y3d2K4=
-github.com/carlmjohnson/flagext v0.0.11/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=
-golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 h1:/atklqdjdhuosWIl6AIbOeHJjicWYPqR9bpxqxYG2pA=
-golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
-golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
-golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+github.com/carlmjohnson/errutil v0.20.1 h1:RadCQottxZxH7GnrLBg3ssl6/kEe4K1D81EZ6td8f9I=
+github.com/carlmjohnson/errutil v0.20.1/go.mod h1:t1n46sLob5fpvrJ5706xDg0zOcj2FigYuhAn37qSRec=
+github.com/carlmjohnson/exitcode v0.20.2 h1:vE6rmkCGNA4kO4m1qwWIa77PKlUBVg46cNjs22eAOXE=
+github.com/carlmjohnson/exitcode v0.20.2/go.mod h1:MZ6ThCDx517DQcrpYnnns1pLh8onjFl+B/AsrOrdmpc=
+github.com/carlmjohnson/flagext v0.21.0 h1:/c4uK3ie786Z7caXLcIMvePNSSiH3bQVGDvmGLMme60=
+github.com/carlmjohnson/flagext v0.21.0/go.mod h1:Eenv0epIUAr4NuedNmkzI8WmBmjIxZC239XcKxYS2ac=

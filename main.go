@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"net/url"
@@ -51,7 +51,7 @@ func exec(args []string) error {
 		return flag.ErrHelp
 	}
 	if !*verbose {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 	hosts := hostsFrom(fl.Args())
 
