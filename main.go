@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"runtime/debug"
 	"strconv"
 	"text/template"
 	"time"
@@ -23,7 +24,7 @@ func main() {
 	exitcode.Exit(exec(os.Args[1:]))
 }
 
-const usage = `Usage of certinfo
+const usage = `Usage of certinfo %s
 
     certinfo [options] <host>...
 
@@ -43,7 +44,7 @@ func exec(args []string) error {
 		"output",
 		"output `mode`: text, json, or none")
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), usage)
+		fmt.Fprintf(fl.Output(), usage, getVersion())
 		fl.PrintDefaults()
 	}
 
@@ -161,4 +162,11 @@ func (h *hostinfo) getCerts(timeout time.Duration) error {
 	}
 
 	return nil
+}
+
+func getVersion() string {
+	if i, ok := debug.ReadBuildInfo(); ok {
+		return i.Main.Version
+	}
+	return "(unknown)"
 }

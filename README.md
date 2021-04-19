@@ -9,12 +9,12 @@ First install [Go](http://golang.org).
 If you just want to install the binary to your current directory and don't care about the source code, run
 
 ```bash
-GOBIN="$(pwd)" GOPATH="$(mktemp -d)" go get github.com/carlmjohnson/certinfo
+GOBIN="$(pwd)" go install github.com/carlmjohnson/certinfo@latest
 ```
 
 ## Screenshots
 
-```bash
+```
 $ certinfo --help
 Usage of certinfo
 
@@ -58,6 +58,6 @@ $ certinfo -output json -verbose example.com
 $ certinfo -output none -expires 24h example.com
 
 $ certinfo -output none -expires 480h example.com
-Runtime error: cert for www.example.org expires too soon: 2018-11-28T12:00:00Z less than 480h0m0s away
+Problem running certinfo: cert for www.example.org expires too soon: 2018-11-28T12:00:00Z less than 480h0m0s away
 
 ```
