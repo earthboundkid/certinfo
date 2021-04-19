@@ -109,7 +109,10 @@ Certs:
 		}
 	}
 
-	return errs.Merge()
+	if err := errs.Merge(); err != nil {
+		fmt.Fprintf(os.Stderr, "Problem running certinfo: %+v\n", err)
+	}
+	return nil
 }
 
 func hostsFrom(ss []string) []string {
